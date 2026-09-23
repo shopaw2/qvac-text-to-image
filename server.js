@@ -16,8 +16,14 @@ console.log('\nModel loaded. Server ready.');
 
 app.post('/generate', async (req, res) => {
   try {
-    const prompt = req.body.prompt || 'a photo of a cat sitting on a windowsill';
+    const prompt = (req.body.prompt || '').trim();
+
+    if (!prompt) {
+      return res.status(400).json({ error: 'Prompt cannot be empty' });
+    }
+
     console.log(`Generating: "${prompt}"`);
+    console.time('generation-time');
 
     const { outputs } = diffusion({
       modelId,
@@ -28,6 +34,8 @@ app.post('/generate', async (req, res) => {
     });
 
     const buffers = await outputs;
+    console.timeEnd('generation-time');
+
     res.set('Content-Type', 'image/png');
     res.send(Buffer.from(buffers[0]));
   } catch (err) {
