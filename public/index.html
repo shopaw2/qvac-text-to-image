@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>QVAC Text-to-Image</title>
+<style>
+  body { font-family: sans-serif; background: #1a1a1a; color: #eee; text-align: center; padding: 40px; }
+  h1 { margin-bottom: 5px; }
+  p.sub { color: #999; margin-top: 0; }
+  #promptForm { max-width: 500px; margin: 30px auto; display: flex; gap: 10px; }
+  #promptInput { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #222; color: #eee; }
+  button { padding: 12px 20px; border-radius: 8px; border: none; background: #4caf50; color: white; cursor: pointer; }
+  button:disabled { background: #555; cursor: not-allowed; }
+  #status { margin-top: 15px; color: #4caf50; }
+  #result { margin-top: 30px; }
+  #result img { max-width: 512px; border-radius: 8px; border: 1px solid #444; }
+</style>
+</head>
+<body>
+  <h1>QVAC Text-to-Image</h1>
+  <p class="sub">On-device image generation — no cloud, no API key. Powered by @qvac/sdk.</p>
+
+  <form id="promptForm">
+    <input type="text" id="promptInput" placeholder="a cat sitting on a windowsill" value="a cat sitting on a windowsill">
+    <button type="submit" id="genBtn">Generate</button>
+  </form>
+
+  <div id="status"></div>
+  <div id="result"></div>
+
+<script>
+  const form = document.getElementById('promptForm');
+  const status = document.getElementById('status');
+  const result = document.getElementById('result');
+  const genBtn = document.getElementById('genBtn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const prompt = document.getElementById('promptInput').value;
+    result.innerHTML = '';
+    status.textContent = 'Generating on-device, please wait (this can take a minute)...';
+    genBtn.disabled = true;
+
+    try {
+      const res = await fetch('/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      if (!res.ok) throw new Error('Generation failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      result.innerHTML = `<img src="${url}">`;
+      status.textContent = 'Done!';
+    } catch (err) {
+      status.textContent = 'Error: ' + err.message;
+    } finally {
+      genBtn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
