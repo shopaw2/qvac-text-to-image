@@ -31,6 +31,12 @@ Then open `http://localhost:3000` in your browser, type a prompt, and click **Ge
 
 On first run, the model downloads automatically (a few hundred MB to a few GB depending on the model). Subsequent runs use the cached model and run fully offline. Generation itself can take from several seconds to a couple of minutes depending on your hardware.
 
+## Notes
+
+- Generation time depends on your hardware — expect anywhere from several seconds to a couple of minutes per image on CPU.
+- For best results, use descriptive prompts (e.g. "a red fox in a snowy forest, digital painting" rather than just "fox").
+- The server keeps the model loaded in memory between requests, so only the first generation after starting the server includes model load time.
+
 ## License
 
 MIT
